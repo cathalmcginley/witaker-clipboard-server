@@ -26,7 +26,7 @@ def check_for_auth_header(headers, clipboard_util):
     if not auth_header:
         return (False, "Authorization required")
     else:
-        auth_match = re.match(r"Basic\s([\d\w]+)", auth_header)
+        auth_match = re.match(r"^Basic\s([\d\w\+\/]+={0,2}$)", auth_header)
         if auth_match:
             auth_key = auth_match[1]
             if clipboard_util.auth_key_matches(auth_key):
@@ -82,3 +82,5 @@ def copy_to_clipboard():
                 return clipboard_error_response(str(e)).dump(), 400  # Client Error
             except AuthorizedClipboardUtilException as e:
                 return clipboard_error_response(str(e)).dump(), 401  # Unauthorized
+    else:
+        return clipboard_error_response(message).dump(), 401

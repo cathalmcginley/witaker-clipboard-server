@@ -52,7 +52,13 @@ def get_port_or_default_port(args):
 
 def get_auth_key_or_generate_auth_key(args):
     if args.auth_key:
-        return args.auth_key
+        base_64_pattern = r"^[\d\w\+\/]+={0,2}$"
+        if re.match(base_64_pattern, args.auth_key):
+            return args.auth_key
+        else:
+            bad_auth_key_error = f"{Style.BRIGHT}{Fore.RED} * Error{Style.RESET_ALL} : auth-key may only contain [A-Z] [a-z] [0-9] + / ="
+            print(bad_auth_key_error)
+            sys.exit(1)
     else:   
         return secrets.token_hex()
 
