@@ -1,5 +1,5 @@
 name = "Witaker Clipboard Server"
-version = "0.2.0"
+version = "0.2.1"
 
 from witaker.clipboardserver.clipboard_model import (
     clipboard_content_response,
@@ -14,6 +14,8 @@ from witaker.clipboardserver.clipboard_model import (
 from witaker.clipboardserver.clipboard_util import (
     AuthorizedClipboardUtil,
     AuthorizedClipboardUtilException,
+    get_auth_marker,
+    get_auth_marker_color
 )
 
 from witaker.clipboardserver.clipboard_server import app
@@ -26,6 +28,3 @@ from witaker.clipboardserver.clipboard_server_run import (
 )
 
 from witaker.clipboardserver.clipboard_server_main import clipboard_server_cli_main
-
-def get_auth_marker(server_port, auth_key):
-    return f"witaker:clipboard-server[port={server_port},auth-key='{auth_key}']"

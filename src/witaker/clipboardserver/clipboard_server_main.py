@@ -4,10 +4,11 @@ import xerox
 from witaker.clipboardserver import (
     name,
     version,
-    get_auth_marker,
     app,
     DEFAULT_SERVER_PORT,
     start_flask_webserver,
+    get_auth_marker,
+    get_auth_marker_color,
     AuthorizedClipboardUtil,
 )
 
@@ -17,9 +18,8 @@ from witaker.clipboardserver import (
 def clipboard_server_cli_main():
     port = DEFAULT_SERVER_PORT
     secret_auth_key = secrets.token_hex()
-    auth_marker = get_auth_marker(port, secret_auth_key)
-    print(f" * Initializing {name} {version}  -  {auth_marker}")
-    xerox.copy(auth_marker)
+    xerox.copy(get_auth_marker(port, secret_auth_key))
+    print(f" * Initializing {name} {version}  -  {get_auth_marker_color(port, secret_auth_key)}")
 
     clipboard_util = AuthorizedClipboardUtil(secret_auth_key)
     app.config["clipboard_util"] = clipboard_util
