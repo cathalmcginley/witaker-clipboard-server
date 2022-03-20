@@ -1,5 +1,6 @@
 import secrets
 import xerox
+from colorama import Fore, Style
 
 from witaker.clipboardserver import (
     name,
@@ -19,7 +20,7 @@ def clipboard_server_cli_main():
     port = DEFAULT_SERVER_PORT
     secret_auth_key = secrets.token_hex()
     xerox.copy(get_auth_marker(port, secret_auth_key))
-    print(f" * Initializing {name} {version}  -  {get_auth_marker_color(port, secret_auth_key)}")
+    print(f" * Initializing {Style.BRIGHT}{Fore.LIGHTGREEN_EX}{name} {Fore.YELLOW}{version}{Style.RESET_ALL}  -  {get_auth_marker_color(port, secret_auth_key)}")
 
     clipboard_util = AuthorizedClipboardUtil(secret_auth_key)
     app.config["clipboard_util"] = clipboard_util

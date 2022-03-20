@@ -31,7 +31,7 @@ class AuthorizedClipboardUtil:
 
 
 def get_auth_marker(server_port, auth_key):
-    return f"witaker:clipboard-server[port={server_port},auth-key='{auth_key}']"
+    return f"witaker:clipboard-server[port={server_port} auth-key='{auth_key}']"
 
 def get_auth_marker_color(server_port, auth_key):
-    return f"witaker:clipboard-server[port={Fore.CYAN}{server_port}{Fore.RESET},auth-key='{Fore.GREEN}{auth_key}{Fore.RESET}']"
+    return get_auth_marker(f"{Fore.CYAN}{server_port}{Fore.RESET}", f"{Fore.GREEN}{auth_key}{Fore.RESET}")
