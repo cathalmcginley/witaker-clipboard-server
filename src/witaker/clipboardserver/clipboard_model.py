@@ -2,6 +2,15 @@ from dataclasses import dataclass
 
 from jsons import JsonSerializable, KEY_TRANSFORMER_LISPCASE, KEY_TRANSFORMER_SNAKECASE
 
+@dataclass
+class PingResponseBody(JsonSerializable):
+    version: str
+
+@dataclass
+class PingErrorBody(JsonSerializable):
+    error: str
+
+
 class ClipboardText(JsonSerializable):
     def __init__(self, text: str):
         if (not text) or (text.strip() == ''):            

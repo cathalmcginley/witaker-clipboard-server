@@ -36,14 +36,15 @@ class SettingsButton(ToggleButtonBehavior, Image):
 
 
 class ClipboardServerApp(App):
-    """Basic kivy app
+    
+    def __init__(self, **kwargs) :
+        super(ClipboardServerApp, self).__init__(**kwargs)
+        self.server_port = DEFAULT_SERVER_PORT
+        self.server_is_running = False
 
-    Edit clipboardfriend.kv to get started.
-    """
+
 
     def on_toggle_settings(self, _button, value):
-        print("on toggle settings")
-        print(value)
         if value == 'down':
             self.footer_pane.add_widget(self.settings_panel)
         elif value == 'normal':
@@ -52,7 +53,7 @@ class ClipboardServerApp(App):
     
     
     def stop_scheduled_tasks(self):
-        print(f"kill queue scheduler : {self.queue_scheduler}")
+        print(f"Removing copy/paste queue scheduler : {self.queue_scheduler}")
         if (self.queue_scheduler):
             Clock.unschedule(self.queue_scheduler)
         if (self.remove_highlight_scheduler):
@@ -60,12 +61,12 @@ class ClipboardServerApp(App):
 
 
     def start_server(self):
-        print("starting server process")
+        print("Starting server process")
         self.server_process = start_server_process(self.server_port, self.app)
         self.server_is_running = True
 
     def stop_server(self):
-        print("stopping server")
+        print("Stopping server")
         stop_server_process(self.server_process)
         self.server_is_running = False
 
@@ -73,7 +74,7 @@ class ClipboardServerApp(App):
     def on_close_app(self, *args):
         self.stop_scheduled_tasks()
         self.stop_server()
-        print("closing Kivy app")
+        print("Closing Kivy app")
         self.stop()
         Window.close()
         self.release_resource_files()
@@ -110,7 +111,6 @@ class ClipboardServerApp(App):
                 port_num = int(port)
                 if port_num >= MIN_PORT and port_num <= MAX_PORT:
                     self.server_port = port_num
-                    print("start server??")
                     self.start_server()
                     self.server_status_panel.remove_widget(self.server_port_text_input)
                     if self.error_label.text != '':
@@ -119,6 +119,7 @@ class ClipboardServerApp(App):
                     self.server_status_label.text = f"Server running on http://localhost:[color={self.port_blue}]{self.server_port}[/color]"
                     self.server_is_running = True
                     self.stop_start_server_button.text = "Stop"
+                    self.copy_auth()
                 else:
                     if self.error_label.text == '':
                         self.main.add_widget(self.error_label)
@@ -138,20 +139,14 @@ class ClipboardServerApp(App):
             
             self.importlib_resource_managers[icon_name] = (manager, icon_path)
             self.icons[icon_name] = str(icon_path)
-            print("access_files " + str(icon_path) + " " + str(type(icon_path)))
 
     def release_resource_files(self):
         for icon_name in self.importlib_resource_managers.keys():
             manager, value = self.importlib_resource_managers[icon_name]
             manager.__exit__(None, value, None)
 
+    
     def build(self):
-
-        print("build")
-
-        self.server_is_running = True
-        self.server_port = DEFAULT_SERVER_PORT
-
         self.icons = {}
         self.importlib_resource_managers = {}
         self.access_resource_files()
@@ -200,8 +195,9 @@ class ClipboardServerApp(App):
         self.settings_panel = BoxLayout(orientation='horizontal', size_hint=(1, None), height=40, spacing=20)
         self.copy_auth_button = Button(text="Copy Auth", size_hint=(None, None), width=120, height=40, background_color="#63ad1d", background_normal='', color="#ffffff", bold=False)
         self.copy_auth_button.bind(on_press=self.copy_auth)
-        self.server_status_panel = BoxLayout(orientation='horizontal', size_hint=(1, None), height=40, spacing=10)
-        self.server_status_label = Label(text=f"Server running on http://localhost:[color={self.port_blue}]{self.server_port}[/color]", color=self.text_color, font_size=20, halign="left", valign="top", size_hint=(1, 0.6), markup=True)
+        self.server_status_wrapper_panel = BoxLayout(orientation='vertical', size_hint=(1, None), height=40)
+        self.server_status_panel = BoxLayout(orientation='horizontal', size_hint=(1, None), height=26, spacing=10)
+        self.server_status_label = Label(text=f"Server running on http://localhost:[color={self.port_blue}]{self.server_port}[/color]", color=self.text_color, font_size=20, halign="left", valign="top", size_hint=(1, None), height=26, markup=True)
         self.server_port_text_input = TextInput(text="", size_hint=(None, None), width=60, height=26, font_size=16, padding=(6,2))
         self.stop_start_server_button = Button(text="Stop", size_hint=(None, None), width=60, height=40, background_color="#63ad1d", background_normal='', color="#ffffff", bold=False)
         self.stop_start_server_button.bind(on_press=self.stop_or_start_server)
@@ -209,13 +205,16 @@ class ClipboardServerApp(App):
 
         self.server_status_panel.add_widget(self.server_status_label)
 
+        self.server_status_wrapper_panel.add_widget(Widget(size_hint=(1, None), height=7))
+        self.server_status_wrapper_panel.add_widget(self.server_status_panel)
+        self.server_status_wrapper_panel.add_widget(Widget(size_hint=(1, None), height=7))
+
         self.settings_panel.add_widget(self.copy_auth_button)
         self.settings_panel.add_widget(settings_spacer)
-        self.settings_panel.add_widget(self.server_status_panel)
+        self.settings_panel.add_widget(self.server_status_wrapper_panel)
         self.settings_panel.add_widget(self.stop_start_server_button)
 
         self.footer_pane.add_widget(self.button)
-        #self.footer_pane.add_widget(self.footer_label)
 
         self.error_label = Label(text="", color=self.text_color, font_size=20, halign="left", valign="top", size_hint=(1, None), height=24, markup=True)
 
@@ -228,7 +227,6 @@ class ClipboardServerApp(App):
         return self.main
 
     def set_server_app(self, app):
-        print("set server app" + str(app))
         self.app = app
 
     def set_clipboard_util(self, util):
@@ -240,6 +238,10 @@ class ClipboardServerApp(App):
     def set_queue(self, q):
         self.q = q
 
+    def set_server_port(self, p):
+        if not self.server_is_running:
+            self.server_port = p
+
     def consumer_process_queue(self, dt=0):
         # while True:        
         if self.q.empty():
@@ -247,7 +249,6 @@ class ClipboardServerApp(App):
         else:
             value = str(self.q.get())
             if value:
-                print(f"Found pasted value: {value}")
                 if self.remove_highlight_scheduler:
                     self.remove_highlight_scheduler.cancel()
                     self.remove_highlight_scheduler = None
