@@ -1,5 +1,5 @@
 name = "Witaker Clipboard Server"
-version = "0.3.0"
+version = "0.3.1"
 
 from witaker.clipboardserver.clipboard_model import (
     clipboard_content_response,
