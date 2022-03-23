@@ -5,11 +5,12 @@ from eventlet import wsgi
 
 DEFAULT_SERVER_PORT = 42157
 
-def start_flask_webserver(port, app):
-    wsgi.server(eventlet.listen(('localhost', port)), app)
+def start_flask_webserver(port, a):
+    import app from witaker.clipboardserver
+    wsgi.server(eventlet.listen(('localhost', port)))
 
-def start_server_process(server_port, app):
-    server_process = Process(target=start_flask_webserver, args=(server_port, app))
+def start_server_process(server_port):
+    server_process = Process(target=start_flask_webserver, args=(server_port, 0))
     server_process.start()
     return server_process
 

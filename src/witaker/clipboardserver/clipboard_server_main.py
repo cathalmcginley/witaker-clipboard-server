@@ -75,10 +75,10 @@ def clipboard_server_cli_main():
 
     secret_auth_key = get_auth_key_or_generate_auth_key(args)
     
-    xerox.copy(get_auth_marker(port, secret_auth_key))
     print(f" * Initializing {program_version_color(name, version)}  -  {get_auth_marker_color(port, secret_auth_key)}")
 
     clipboard_util = AuthorizedClipboardUtil(secret_auth_key)
+    clipboard_util.copy_text_to_clipboard(secret_auth_key, get_auth_marker(port, secret_auth_key))
     app.config["clipboard_util"] = clipboard_util
 
     start_flask_webserver(port, app)
