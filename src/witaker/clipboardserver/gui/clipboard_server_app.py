@@ -62,7 +62,7 @@ class ClipboardServerApp(App):
 
     def start_server(self):
         print("Starting server process")
-        self.server_process = start_server_process(self.server_port, self.app)
+        self.server_process = start_server_process(self.server_port)
         self.server_is_running = True
 
     def stop_server(self):
@@ -225,9 +225,6 @@ class ClipboardServerApp(App):
         self.remove_highlight_scheduler = None
 
         return self.main
-
-    def set_server_app(self, app):
-        self.app = app
 
     def set_clipboard_util(self, util):
         self.clipboard_util = util

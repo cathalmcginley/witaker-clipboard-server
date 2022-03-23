@@ -47,6 +47,5 @@ def clipboard_server_gui_main():
     gui.set_secret_auth_key(secret_auth_key)
     gui.set_clipboard_util(clipboard_util)
     gui.set_server_port(port)
-    gui.set_server_app(app)
     gui.run()
     return 0

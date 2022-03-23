@@ -81,5 +81,5 @@ def clipboard_server_cli_main():
     clipboard_util.copy_text_to_clipboard(secret_auth_key, get_auth_marker(port, secret_auth_key))
     app.config["clipboard_util"] = clipboard_util
 
-    start_flask_webserver(port, app)
+    start_flask_webserver(port)
     return 0
