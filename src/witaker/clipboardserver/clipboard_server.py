@@ -42,11 +42,11 @@ def ping():
     auth_is_valid, message = check_for_auth_header(
         request.headers, app.config["clipboard_util"]
     )
+    ver_string = f"{name} {version}"
     if auth_is_valid:
-
-        return PingResponseBody(f"{name} {version}").dump
+        return PingResponseBody(version=ver_string).dump()
     else:
-        return PingErrorBody(message), 401
+        return PingErrorBody(version=ver_string, error=message).dump(), 401
 
 
 @app.route("/clipboard", methods=["GET", "POST"])

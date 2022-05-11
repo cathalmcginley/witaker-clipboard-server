@@ -1,4 +1,4 @@
-.PHONY: clean build
+.PHONY: clean build upload
 
 clean:
 	find -name '*~' -delete
@@ -8,3 +8,6 @@ clean:
 
 build:
 	python3 -m build
+
+upload:
+	twine upload dist/*

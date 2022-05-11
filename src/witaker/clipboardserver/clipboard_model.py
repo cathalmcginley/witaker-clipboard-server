@@ -7,7 +7,7 @@ class PingResponseBody(JsonSerializable):
     version: str
 
 @dataclass
-class PingErrorBody(JsonSerializable):
+class PingErrorBody(PingResponseBody):
     error: str
 
 
