@@ -77,9 +77,8 @@ def clipboard_server_cli_main():
     
     print(f" * Initializing {program_version_color(name, version)}  -  {get_auth_marker_color(port, secret_auth_key)}")
 
-    clipboard_util = AuthorizedClipboardUtil(secret_auth_key)
-    clipboard_util.copy_text_to_clipboard(secret_auth_key, get_auth_marker(port, secret_auth_key))
-    app.config["clipboard_util"] = clipboard_util
+    app.set_key(secret_auth_key)
+    app.util.copy_text_to_clipboard(secret_auth_key, get_auth_marker(port, secret_auth_key))
 
     start_flask_webserver(port)
     return 0

@@ -1,4 +1,5 @@
 import re
+import sys
 
 from flask import Flask, request
 from flask_cors import CORS
@@ -7,6 +8,7 @@ from jsons.exceptions import UnfulfilledArgumentError
 from witaker.clipboardserver import (
     name,
     version,
+    AuthorizedClipboardUtil,
     AuthorizedClipboardUtilException,
     ClipboardRequestBody,
     PingResponseBody,
@@ -15,8 +17,20 @@ from witaker.clipboardserver import (
     clipboard_error_response,
 )
 
+print(" --- loading this module once ---")
+sys.stdout.flush()
 
-app = Flask(__name__)
+u = AuthorizedClipboardUtil("secret_auth_key")
+
+class WitakerFlask(Flask):
+    def __init__(self, name, util):
+        Flask.__init__(self, name)
+        self.util = util
+
+    def set_key(self, key):
+        self.util.session_key = key
+
+app = WitakerFlask(__name__, u)
 cors = CORS(app)
 ## cors = CORS(app, resources={"/clipboard": {"origins": "http://localhost"}})
 
@@ -40,7 +54,7 @@ def check_for_auth_header(headers, clipboard_util):
 @app.route("/ping", methods=["GET"])
 def ping():
     auth_is_valid, message = check_for_auth_header(
-        request.headers, app.config["clipboard_util"]
+        request.headers, app.util
     )
     ver_string = f"{name} {version}"
     if auth_is_valid:
@@ -52,11 +66,11 @@ def ping():
 @app.route("/clipboard", methods=["GET", "POST"])
 def copy_to_clipboard():
     auth_is_valid, message = check_for_auth_header(
-        request.headers, app.config["clipboard_util"]
+        request.headers, app.util
     )
     if auth_is_valid:
         if request.method == "GET":
-            text = app.config["clipboard_util"].paste_text_from_clipboard(auth_key)
+            text = app.util.paste_text_from_clipboard(auth_key)
             response = clipboard_content_response(text)
             return response.dump()
         elif request.method == "POST":
@@ -66,10 +80,10 @@ def copy_to_clipboard():
                 print(
                     f" + Copying text to clipboard [{req.clipboard_request.copy.text[0:24]}...]"
                 )
-                app.config["clipboard_util"].copy_text_to_clipboard(
+                app.util.copy_text_to_clipboard(
                     auth_key, req.clipboard_request.copy.text
                 )
-                text = app.config["clipboard_util"].paste_text_from_clipboard(auth_key)
+                text = app.util.paste_text_from_clipboard(auth_key)
                 if text == req.clipboard_request.copy.text:
                     response = clipboard_content_response(text)
                     return response.dump()
