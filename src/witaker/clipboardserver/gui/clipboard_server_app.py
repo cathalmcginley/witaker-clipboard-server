@@ -14,8 +14,13 @@ from kivy.clock import Clock
 from kivy.graphics import Color, Rectangle
 from kivy.uix.behaviors import ToggleButtonBehavior
 
-from witaker.clipboardserver import get_auth_marker, DEFAULT_SERVER_PORT, start_server_process, stop_server_process
-from witaker.clipboardserver import WitakerFlask
+from witaker.clipboardserver import (
+    get_auth_marker,
+    DEFAULT_SERVER_PORT,
+    start_server_process,
+    stop_server_process,
+    AuthorizedClipboardUtil
+)
 
 
 class SettingsButton(ToggleButtonBehavior, Image):
@@ -39,17 +44,15 @@ class SettingsButton(ToggleButtonBehavior, Image):
 
 class ClipboardServerApp(App):
     
-    app: WitakerFlask
+    clipboard_util: AuthorizedClipboardUtil
 
-    def __init__(self, app: WitakerFlask, **kwargs) :
+    def __init__(self, secret_auth_key: str, **kwargs) :
         super(ClipboardServerApp, self).__init__(**kwargs)
-        self.app = app
+        self.clipboard_util = AuthorizedClipboardUtil(secret_auth_key)
         self.server_port = DEFAULT_SERVER_PORT
         self.server_is_running = False
-        self.set_queue(app.util.queue)
-        self.set_secret_auth_key(app.util.session_key)
-        self.set_clipboard_util(app.util)
-
+        self.set_queue(self.clipboard_util.queue)
+        self.set_secret_auth_key(self.clipboard_util.session_key)
 
 
     def on_toggle_settings(self, _button, value):
@@ -70,7 +73,7 @@ class ClipboardServerApp(App):
 
     def start_server(self):
         print("Starting server process")
-        self.server_process = start_server_process(self.app, self.server_port)
+        self.server_process = start_server_process(self.clipboard_util, self.server_port)
         self.server_is_running = True
 
     def stop_server(self):
@@ -79,7 +82,7 @@ class ClipboardServerApp(App):
         self.server_is_running = False
 
 
-    def on_close_app(self, *args):
+    def on_close_app(self, *args, **kwargs):
         self.stop_scheduled_tasks()
         self.stop_server()
         print("Closing Kivy app")
@@ -233,9 +236,6 @@ class ClipboardServerApp(App):
         self.remove_highlight_scheduler = None
 
         return self.main
-
-    def set_clipboard_util(self, util):
-        self.clipboard_util = util
 
     def set_secret_auth_key(self, auth_key):
         self.auth_key = auth_key

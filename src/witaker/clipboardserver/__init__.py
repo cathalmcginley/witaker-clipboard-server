@@ -1,5 +1,5 @@
 name = "Witaker Clipboard Server"
-version = "0.3.3"
+version = "0.3.4"
 
 from witaker.clipboardserver.clipboard_model import (
     clipboard_content_response,
@@ -20,7 +20,11 @@ from witaker.clipboardserver.clipboard_util import (
     get_auth_marker_color,
 )
 
-from witaker.clipboardserver.clipboard_server import WitakerFlask, create_flask_app
+from witaker.clipboardserver.clipboard_server import (
+    WitakerFlask,
+    create_flask_app,
+    create_default_flask_app
+)
 
 from witaker.clipboardserver.clipboard_server_run import (
     DEFAULT_SERVER_PORT,

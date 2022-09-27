@@ -39,10 +39,7 @@ def clipboard_server_gui_main():
     secret_auth_key = get_auth_key_or_generate_auth_key(args)
     print(f" * Initializing GUI for {program_version_color(name, version)}")
     
-    app = create_flask_app("GUI")
-    app.set_key(secret_auth_key)
-
-    gui = ClipboardServerApp(app)
+    gui = ClipboardServerApp(secret_auth_key)
     gui.set_server_port(port)
     gui.run()
     return 0

@@ -1,4 +1,5 @@
 import re
+import secrets
 import sys
 
 from flask import Flask, request
@@ -17,11 +18,6 @@ from witaker.clipboardserver import (
     clipboard_error_response,
 )
 
-print(" --- loading this module once ---")
-sys.stdout.flush()
-
-u = AuthorizedClipboardUtil("secret_auth_key")
-
 class WitakerFlask(Flask):
 
     util: AuthorizedClipboardUtil
@@ -34,8 +30,8 @@ class WitakerFlask(Flask):
         self.util.session_key = key
 
 
-def create_flask_app(name: str) -> WitakerFlask:
-    app = WitakerFlask(name, u)
+def create_flask_app(name: str, util: AuthorizedClipboardUtil) -> WitakerFlask:
+    app = WitakerFlask(name, util)
     cors = CORS(app)
 
 
@@ -104,3 +100,8 @@ def create_flask_app(name: str) -> WitakerFlask:
             return clipboard_error_response(message).dump(), 401
 
     return app
+
+def create_default_flask_app() -> WitakerFlask:
+    key = secrets.token_hex()
+    util = AuthorizedClipboardUtil(key)
+    return create_flask_app(__name__, util)
