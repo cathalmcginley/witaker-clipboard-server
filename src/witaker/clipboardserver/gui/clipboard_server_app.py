@@ -15,11 +15,13 @@ from kivy.graphics import Color, Rectangle
 from kivy.uix.behaviors import ToggleButtonBehavior
 
 from witaker.clipboardserver import get_auth_marker, DEFAULT_SERVER_PORT, start_server_process, stop_server_process
+from witaker.clipboardserver import WitakerFlask
 
 
 class SettingsButton(ToggleButtonBehavior, Image):
     def __init__(self, **kwargs):
         super(SettingsButton, self).__init__(**kwargs)
+
 
     def set_button_icons(self, active_icon, inactive_icon):
         self.active_icon = active_icon
@@ -37,10 +39,16 @@ class SettingsButton(ToggleButtonBehavior, Image):
 
 class ClipboardServerApp(App):
     
-    def __init__(self, **kwargs) :
+    app: WitakerFlask
+
+    def __init__(self, app: WitakerFlask, **kwargs) :
         super(ClipboardServerApp, self).__init__(**kwargs)
+        self.app = app
         self.server_port = DEFAULT_SERVER_PORT
         self.server_is_running = False
+        self.set_queue(app.util.queue)
+        self.set_secret_auth_key(app.util.session_key)
+        self.set_clipboard_util(app.util)
 
 
 
@@ -62,7 +70,7 @@ class ClipboardServerApp(App):
 
     def start_server(self):
         print("Starting server process")
-        self.server_process = start_server_process(self.server_port)
+        self.server_process = start_server_process(self.app, self.server_port)
         self.server_is_running = True
 
     def stop_server(self):

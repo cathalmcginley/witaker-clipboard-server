@@ -2,9 +2,9 @@ import argparse
 import signal
 
 from witaker.clipboardserver import (
-    app,
     name,
     version,
+    create_flask_app,
     AuthorizedClipboardUtil,
     add_program_arguments,
     if_version_print_version_and_exit,
@@ -39,12 +39,10 @@ def clipboard_server_gui_main():
     secret_auth_key = get_auth_key_or_generate_auth_key(args)
     print(f" * Initializing GUI for {program_version_color(name, version)}")
     
+    app = create_flask_app("GUI")
     app.set_key(secret_auth_key)
 
-    gui = ClipboardServerApp()
-    gui.set_queue(app.util.queue)
-    gui.set_secret_auth_key(secret_auth_key)
-    gui.set_clipboard_util(app.util)
+    gui = ClipboardServerApp(app)
     gui.set_server_port(port)
     gui.run()
     return 0

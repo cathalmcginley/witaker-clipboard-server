@@ -7,7 +7,7 @@ import xerox
 from colorama import Fore, Style
 
 from witaker.clipboardserver import (
-    app,
+    create_flask_app,
     name,
     version,
     DEFAULT_SERVER_PORT,
@@ -77,8 +77,9 @@ def clipboard_server_cli_main():
     
     print(f" * Initializing {program_version_color(name, version)}  -  {get_auth_marker_color(port, secret_auth_key)}")
 
+    app = create_flask_app("CLI")
     app.set_key(secret_auth_key)
     app.util.copy_text_to_clipboard(secret_auth_key, get_auth_marker(port, secret_auth_key))
 
-    start_flask_webserver(port)
+    start_flask_webserver(app, port)
     return 0
