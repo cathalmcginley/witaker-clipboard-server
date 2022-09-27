@@ -35,6 +35,10 @@ You can install Witaker Clipboard Server with pip:
 pip install witaker-clipboard-server
 ```
 
+## Build
+
+For instructions on building, see [BUILD.md](BUILD.md)
+
 
 ## License
 
