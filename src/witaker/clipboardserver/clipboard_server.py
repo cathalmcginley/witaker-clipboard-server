@@ -7,8 +7,8 @@ from flask_cors import CORS
 from jsons.exceptions import UnfulfilledArgumentError
 
 from witaker.clipboardserver import (
-    name,
-    version,
+    name as project_name,
+    version as project_version,
     AuthorizedClipboardUtil,
     AuthorizedClipboardUtilException,
     ClipboardRequestBody,
@@ -56,7 +56,7 @@ def create_flask_app(name: str, util: AuthorizedClipboardUtil) -> WitakerFlask:
         auth_is_valid, message = check_for_auth_header(
             request.headers, app.util
         )
-        ver_string = f"{name} {version}"
+        ver_string = f"{name} {project_version}"
         if auth_is_valid:
             return PingResponseBody(version=ver_string).dump()
         else:
@@ -104,4 +104,4 @@ def create_flask_app(name: str, util: AuthorizedClipboardUtil) -> WitakerFlask:
 def create_default_flask_app() -> WitakerFlask:
     key = secrets.token_hex()
     util = AuthorizedClipboardUtil(key)
-    return create_flask_app(__name__, util)
+    return create_flask_app(project_name, util)
